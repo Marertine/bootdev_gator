@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"errors"
@@ -6,32 +6,34 @@ import (
 )
 
 type command struct {
-	name string
-	args []string
-	//callback    func(*Config, ...string) error
+	Name string
+	Args []string
 }
 
 type commands struct {
-	name        string
-	mapCommands map[string]func(*state, command) error
-	//callback    func(*Config, ...string) error
-}
-
-func (c *commands) run(s *state, cmd command) error {
-	// Runs the given command with the provided state, if it exists
+	registeredCommands map[string]func(*state, command) error
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
 	//This method registers a new handler function for a command name.
-	c.mapCommands[name] = f
+	c.registeredCommands[name] = f
+}
+
+func (c *commands) run(s *state, cmd command) error {
+	// Runs the given command with the provided state, if it exists
+	f, ok := c.registeredCommands[cmd.Name]
+	if !ok {
+		return errors.New("command not found")
+	}
+	return f(s, cmd)
 }
 
 func cmdLogin(s *state, cmd command) error {
-	if len(cmd.args) == 0 {
+	if len(cmd.Args) == 0 {
 		return errors.New("'Login' requires a username")
 	}
 
-	name := cmd.args[0]
+	name := cmd.Args[0]
 
 	s.config.CurrentUserName = name
 	/*err := s.config.SetUser(name)
@@ -40,4 +42,5 @@ func cmdLogin(s *state, cmd command) error {
 	}*/
 
 	fmt.Printf("User has been set as '%s'\n", name)
+	return nil
 }
