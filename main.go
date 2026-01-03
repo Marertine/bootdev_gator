@@ -16,17 +16,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// 2. Set user to your name
-	if err := cfg.SetUser("michael"); err != nil {
-		log.Fatal(err)
+	myState := state{
+		config: cfg,
 	}
 
-	// 3. Read again
-	cfg2, err := config.Read()
-	if err != nil {
-		log.Fatal(err)
-	}
+	/*
+		// 2. Set user to your name
+		if err := cfg.SetUser("michael"); err != nil {
+			log.Fatal(err)
+		}
 
-	// 4. Print config
-	fmt.Println(cfg2)
+		// 3. Read again
+		cfg2, err := config.Read()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 4. Print config
+		fmt.Println(cfg2)*/
 }
