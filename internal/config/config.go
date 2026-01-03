@@ -44,6 +44,10 @@ func Read() (Config, error) {
 }
 
 func (c *Config) SetUser(name string) error {
+	// If this were func(c Config) it would be working with a COPY
+	// of the config, but we want to actually amend the original so
+	// we must work with a pointer to it!!
+
 	// Put the provided parameter into the Config struct
 	c.CurrentUserName = name
 
