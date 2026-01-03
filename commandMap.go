@@ -35,11 +35,11 @@ func cmdLogin(s *state, cmd command) error {
 
 	name := cmd.Args[0]
 
-	s.config.CurrentUserName = name
-	/*err := s.config.SetUser(name)
+	s.cfg.CurrentUserName = name
+	err := s.cfg.SetUser(name)
 	if err != nil {
 		return err
-	}*/
+	}
 
 	fmt.Printf("User has been set as '%s'\n", name)
 	return nil

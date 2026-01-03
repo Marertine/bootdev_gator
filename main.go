@@ -33,12 +33,9 @@ func main() {
 		log.Fatal("not enough command line arguments")
 	}
 
-	cmdName := os.Args[0]
-	cmdArgs := os.Args[1]
-
 	myCmd := command{
-		Name: cmdName,
-		Args: cmdArgs,
+		Name: os.Args[1],
+		Args: os.Args[2:],
 	}
 
 	err = cmds.run(myState, myCmd)
