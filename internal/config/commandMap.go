@@ -3,9 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	//"math/rand"
-	//"os"
-	//"time"
 )
 
 type command struct {
@@ -20,18 +17,13 @@ type commands struct {
 	//callback    func(*Config, ...string) error
 }
 
-/* 2. Define a method for the struct
-// The (r Rectangle) is the receiver
-func (r Rectangle) Area() int {
-	return r.width * r.height
-}*/
-
 func (c *commands) run(s *state, cmd command) error {
 	// Runs the given command with the provided state, if it exists
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
 	//This method registers a new handler function for a command name.
+	c.mapCommands[name] = f
 }
 
 func cmdLogin(s *state, cmd command) error {

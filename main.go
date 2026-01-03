@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/Marertine/bootdev_gator/internal/config"
 )
@@ -20,18 +21,15 @@ func main() {
 		config: cfg,
 	}
 
-	/*
-		// 2. Set user to your name
-		if err := cfg.SetUser("michael"); err != nil {
-			log.Fatal(err)
-		}
+	myMap := make(map[string]string)
+	myCommands := commands{
+		mapCommands: myMap,
+	}
 
-		// 3. Read again
-		cfg2, err := config.Read()
-		if err != nil {
-			log.Fatal(err)
-		}
+	myCmd := command{
+		name: "login",
+		args: os.Args,
+	}
+	myCommands.register("login", "cmdLogin", myCmd)
 
-		// 4. Print config
-		fmt.Println(cfg2)*/
 }
