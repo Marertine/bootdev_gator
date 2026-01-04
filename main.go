@@ -45,6 +45,7 @@ func main() {
 	cmds.register("login", cmdLogin)
 	cmds.register("register", cmdRegister)
 	cmds.register("reset", cmdDeleteAllUsers)
+	cmds.register("users", cmdListAllUsers)
 
 	// Ensure the appropriate number of command line arguments for each command
 	// When compiled...
@@ -59,6 +60,8 @@ func main() {
 	case "register":
 		intRequiredOSArgLength = 3
 	case "reset":
+		intRequiredOSArgLength = 2
+	case "users":
 		intRequiredOSArgLength = 2
 	}
 

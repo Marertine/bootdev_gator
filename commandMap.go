@@ -98,10 +98,15 @@ func cmdRegister(s *state, cmd command) error {
 		return err
 	}
 
-	fmt.Printf("User '%s' has been created.", user.Name)
-	fmt.Printf("DEBUG: %v user: %s inserted with UUID: %v\n", user.CreatedAt, user.Name, user.ID)
+	fmt.Printf("User '%s' has been created.\n", user.Name)
+	printUser(user)
 
 	return nil
+}
+
+func printUser(user database.User) {
+	fmt.Printf(" * ID:      %v\n", user.ID)
+	fmt.Printf(" * Name:    %v\n", user.Name)
 }
 
 func cmdDeleteAllUsers(s *state, cmd command) error {
@@ -109,24 +114,32 @@ func cmdDeleteAllUsers(s *state, cmd command) error {
 
 	err := s.db.DeleteAllUsers(myCtx)
 	if err != nil {
-		// Type assertion to *pq.Error
-		/*if pqErr, ok := err.(*pq.Error); ok {
-			// Inspect the PostgreSQL error code
-			fmt.Println("Postgres error code:", pqErr.Code)
-			fmt.Println("Message:", pqErr.Message)
-			fmt.Println("Detail:", pqErr.Detail)
-			fmt.Println("Constraint:", pqErr.Constraint)
-
-			// Example: unique violation
-			if pqErr.Code == "23505" {
-				return fmt.Errorf("User already exists")
-			}
-		}*/
 		// All other errors
 		return err
 	}
 
 	fmt.Println("Database reset, all users deleted.")
+
+	return nil
+}
+
+func cmdListAllUsers(s *state, cmd command) error {
+	myCtx := context.Background()
+
+	respUsers, err := s.db.GetUsers(myCtx)
+	if err != nil {
+		// All other errors
+		return err
+	}
+
+	for _, user := range respUsers {
+		outputString := user.Name
+		currentString := ""
+		if outputString == s.cfg.CurrentUserName {
+			currentString = " (current)"
+		}
+		fmt.Printf("* %s%s\n", outputString, currentString)
+	}
 
 	return nil
 }
