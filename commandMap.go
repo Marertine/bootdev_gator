@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -37,24 +38,32 @@ func (c *commands) run(s *state, cmd command) error {
 
 func cmdLogin(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
-		return errors.New("'Login' requires a username")
+		return errors.New("'login' requires a username")
 	}
 
-	name := cmd.Args[0]
+	myCtx := context.Background()
+	user, err := s.db.GetUser(myCtx, cmd.Args[0])
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// 0 rows returned → user not found
+			return fmt.Errorf("login: user not found")
+		}
+		// All other errors
+		return err
+	}
 
-	s.cfg.CurrentUserName = name
-	err := s.cfg.SetUser(name)
+	err = s.cfg.SetUser(user.Name)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("User has been set as '%s'\n", name)
+	fmt.Printf("User has been set as '%s'\n", user.Name)
 	return nil
 }
 
 func cmdRegister(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
-		return errors.New("'Register' requires a username")
+		return errors.New("'register' requires a username")
 	}
 
 	myCtx := context.Background()

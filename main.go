@@ -25,6 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("Using DB URL:", cfg.DbURL)
+
 	defer db.Close()
 	dbQueries := database.New(db)
 
