@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 )
@@ -31,7 +32,12 @@ func Read() (Config, error) {
 	}
 
 	data, err := os.ReadFile(strConfigFile)
+	if errors.Is(err, os.ErrNotExist) {
+		// Config doesn't yet exist, return default Config and no error
+		return configResp, nil
+	}
 	if err != nil {
+		// All other errors
 		return Config{}, err
 	}
 

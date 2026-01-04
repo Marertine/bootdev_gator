@@ -56,6 +56,7 @@ func main() {
 
 	err = cmds.run(myState, myCmd)
 	if err != nil {
+		log.Printf("DEBUG handler error: %v", err)
 		log.Fatal(err)
 	}
 
