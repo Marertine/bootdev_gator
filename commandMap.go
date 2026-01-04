@@ -103,3 +103,30 @@ func cmdRegister(s *state, cmd command) error {
 
 	return nil
 }
+
+func cmdDeleteAllUsers(s *state, cmd command) error {
+	myCtx := context.Background()
+
+	err := s.db.DeleteAllUsers(myCtx)
+	if err != nil {
+		// Type assertion to *pq.Error
+		/*if pqErr, ok := err.(*pq.Error); ok {
+			// Inspect the PostgreSQL error code
+			fmt.Println("Postgres error code:", pqErr.Code)
+			fmt.Println("Message:", pqErr.Message)
+			fmt.Println("Detail:", pqErr.Detail)
+			fmt.Println("Constraint:", pqErr.Constraint)
+
+			// Example: unique violation
+			if pqErr.Code == "23505" {
+				return fmt.Errorf("User already exists")
+			}
+		}*/
+		// All other errors
+		return err
+	}
+
+	fmt.Println("Database reset, all users deleted.")
+
+	return nil
+}
