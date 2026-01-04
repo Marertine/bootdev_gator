@@ -1,20 +1,36 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/Marertine/bootdev_gator/internal/config"
+	"github.com/Marertine/bootdev_gator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
 	fmt.Println("Boot.Dev/RSS Aggregator Project")
 
-	// 1. Read config
+	// Read config
 	cfg, err := config.Read()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Connect to the database
+	db, err := sql.Open("postgres", cfg.DbURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	dbQueries := database.New(db)
+
+	myState := &state{
+		cfg: &cfg,
+		db:  dbQueries,
 	}
 
 	// Initialise the map that will hold the allowed commands
@@ -24,10 +40,7 @@ func main() {
 
 	// Populate the list of allowed commands
 	cmds.register("login", cmdLogin)
-
-	myState := &state{
-		cfg: &cfg,
-	}
+	cmds.register("register", cmdRegister)
 
 	if len(os.Args) < 2 {
 		log.Fatal("not enough command line arguments")
