@@ -221,6 +221,18 @@ func printFeed(feed database.Feed) {
 	fmt.Printf(" * User ID: %v\n", feed.UserID)
 }
 
+func getUserByID(s *state, userID uuid.UUID) (database.User, error) {
+	myCtx := context.Background()
+	myUser, err := s.db.GetUserByID(myCtx, userID)
+	if err != nil {
+		// Don't need to test for sql.ErrNoRows separately here because we tested that in login
+		// All other errors
+		return database.User{}, err
+	}
+
+	return myUser, nil
+}
+
 func cmdListAllFeeds(s *state, cmd command) error {
 	myCtx := context.Background()
 
@@ -233,7 +245,11 @@ func cmdListAllFeeds(s *state, cmd command) error {
 	for _, feed := range respFeeds {
 		fmt.Printf("* %s\n", feed.Name)
 		fmt.Printf("* %s\n", feed.Url)
-		fmt.Printf("* %s\n", feed.UserID)
+		myUser, err := getUserByID(s, feed.UserID)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("* %s\n", myUser.Name)
 	}
 
 	return nil
