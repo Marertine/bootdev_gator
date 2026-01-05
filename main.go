@@ -55,33 +55,34 @@ func main() {
 		log.Fatal("no command line arguments provided")
 	}
 
-	// Ensure the appropriate number of command line arguments for each command
-	// When compiled...
-	// 		os.Args[0] = programname  (eg ./mycli)
-	// 		os.Args[1] = command
-	// 		os.Args[2] = arg1
-	// 		os.Args[3] = arg2
-	intRequiredOSArgLength := 0
-	switch os.Args[1] {
-	case "test":
-		intRequiredOSArgLength = 2
-	case "addfeed":
-		intRequiredOSArgLength = 4
-	case "agg":
-		intRequiredOSArgLength = 2
-	case "login":
-		intRequiredOSArgLength = 3
-	case "register":
-		intRequiredOSArgLength = 3
-	case "reset":
-		intRequiredOSArgLength = 2
-	case "users":
-		intRequiredOSArgLength = 2
-	}
+	/*
+		// Ensure the appropriate number of command line arguments for each command
+		// When compiled...
+		// 		os.Args[0] = programname  (eg ./mycli)
+		// 		os.Args[1] = command
+		// 		os.Args[2] = arg1
+		// 		os.Args[3] = arg2
+		intRequiredOSArgLength := 0
+		switch os.Args[1] {
+		case "test":
+			intRequiredOSArgLength = 2
+		case "addfeed":
+			intRequiredOSArgLength = 4
+		case "agg":
+			intRequiredOSArgLength = 2
+		case "login":
+			intRequiredOSArgLength = 3
+		case "register":
+			intRequiredOSArgLength = 3
+		case "reset":
+			intRequiredOSArgLength = 2
+		case "users":
+			intRequiredOSArgLength = 2
+		}
 
-	if len(os.Args) < intRequiredOSArgLength {
-		log.Fatal("not enough command line arguments")
-	}
+		if len(os.Args) < intRequiredOSArgLength {
+			log.Fatal("not enough command line arguments")
+		}*/
 
 	myCmd := command{
 		Name: os.Args[1],
