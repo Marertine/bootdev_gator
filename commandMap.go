@@ -208,6 +208,11 @@ func cmdAddFeed(s *state, cmd command) error {
 		return err
 	}
 
+	_, err = followFeedForUser(myCtx, s.db, s.cfg.CurrentUserName, cmd.Args[1])
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Feed '%s' has been created.\n", feed.Name)
 	printFeed(feed)
 
@@ -253,4 +258,73 @@ func cmdListAllFeeds(s *state, cmd command) error {
 	}
 
 	return nil
+}
+
+func cmdFollowing(s *state, cmd command) error {
+	myCtx := context.Background()
+
+	userName := s.cfg.CurrentUserName
+
+	myUser, err := s.db.GetUser(myCtx, userName)
+	if err != nil {
+		return err
+	}
+
+	feedFollows, err := s.db.GetFeedFollowsForUser(myCtx, myUser.ID)
+	if err != nil {
+		return err
+	}
+
+	for _, ff := range feedFollows {
+		fmt.Println(ff.FeedName)
+	}
+
+	return nil
+}
+
+func cmdFollowFeed(s *state, cmd command) error {
+	if len(cmd.Args) < 1 {
+		return errors.New("follow requires a url")
+	}
+
+	myCtx := context.Background()
+	feedURL := cmd.Args[0]
+	userName := s.cfg.CurrentUserName
+
+	followedFeed, err := followFeedForUser(myCtx, s.db, userName, feedURL)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Feed '%s' is now followed by user '%s'.\n", followedFeed.FeedName, followedFeed.UserName)
+	return nil
+}
+
+func followFeedForUser(ctx context.Context, db *database.Queries, userName string, feedURL string) (database.CreateFeedFollowRow, error) {
+
+	feed, err := db.GetFeedByURL(ctx, feedURL)
+	if err != nil {
+		return database.CreateFeedFollowRow{}, err
+	}
+
+	myUser, err := db.GetUser(ctx, userName)
+	if err != nil {
+		return database.CreateFeedFollowRow{}, err
+	}
+
+	myFeedFollowParams := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    myUser.ID,
+		FeedID:    feed.ID,
+	}
+
+	followedFeed, err := db.CreateFeedFollow(ctx, myFeedFollowParams)
+	if err != nil {
+		return database.CreateFeedFollowRow{}, err
+	}
+
+	return followedFeed, nil
+
 }
