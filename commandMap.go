@@ -166,19 +166,19 @@ func cmdAgg(s *state, cmd command) error {
 	return nil
 }
 
-func cmdAddFeed(s *state, cmd command) error {
+func cmdAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) < 2 {
 		return errors.New("addfeed requires a name and a URL")
 	}
 
 	myCtx := context.Background()
 
-	myUser, err := s.db.GetUser(myCtx, s.cfg.CurrentUserName)
+	/*myUser, err := s.db.GetUser(myCtx, s.cfg.CurrentUserName)
 	if err != nil {
 		// Don't need to test for sql.ErrNoRows separately here because we tested that in login
 		// All other errors
 		return err
-	}
+	}*/
 
 	myFeedParams := database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -186,7 +186,7 @@ func cmdAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now().UTC(),
 		Name:      cmd.Args[0],
 		Url:       cmd.Args[1],
-		UserID:    myUser.ID,
+		UserID:    user.ID,
 	}
 
 	feed, err := s.db.CreateFeed(myCtx, myFeedParams)
@@ -208,7 +208,7 @@ func cmdAddFeed(s *state, cmd command) error {
 		return err
 	}
 
-	_, err = followFeedForUser(myCtx, s.db, s.cfg.CurrentUserName, cmd.Args[1])
+	_, err = followFeedForUser(myCtx, s.db, user.Name, cmd.Args[1])
 	if err != nil {
 		return err
 	}
@@ -260,17 +260,17 @@ func cmdListAllFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func cmdFollowing(s *state, cmd command) error {
+func cmdFollowing(s *state, cmd command, user database.User) error {
 	myCtx := context.Background()
 
-	userName := s.cfg.CurrentUserName
+	//userName := s.cfg.CurrentUserName
 
-	myUser, err := s.db.GetUser(myCtx, userName)
+	/*myUser, err := s.db.GetUser(myCtx, user.Name)
 	if err != nil {
 		return err
-	}
+	}*/
 
-	feedFollows, err := s.db.GetFeedFollowsForUser(myCtx, myUser.ID)
+	feedFollows, err := s.db.GetFeedFollowsForUser(myCtx, user.ID)
 	if err != nil {
 		return err
 	}
@@ -282,16 +282,16 @@ func cmdFollowing(s *state, cmd command) error {
 	return nil
 }
 
-func cmdFollowFeed(s *state, cmd command) error {
+func cmdFollowFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) < 1 {
 		return errors.New("follow requires a url")
 	}
 
 	myCtx := context.Background()
 	feedURL := cmd.Args[0]
-	userName := s.cfg.CurrentUserName
+	//userName := s.cfg.CurrentUserName
 
-	followedFeed, err := followFeedForUser(myCtx, s.db, userName, feedURL)
+	followedFeed, err := followFeedForUser(myCtx, s.db, user.Name, feedURL)
 	if err != nil {
 		return err
 	}
@@ -327,4 +327,30 @@ func followFeedForUser(ctx context.Context, db *database.Queries, userName strin
 
 	return followedFeed, nil
 
+}
+
+func cmdDeleteFollowFeed(s *state, cmd command, user database.User) error {
+	if len(cmd.Args) < 1 {
+		return errors.New("unfollow requires a url")
+	}
+
+	myCtx := context.Background()
+
+	myFeed, err := s.db.GetFeedByURL(myCtx, cmd.Args[0])
+	if err != nil {
+		return err
+	}
+
+	myDeleteParams := database.DeleteFeedFollowParams{
+		UserID: user.ID,
+		FeedID: myFeed.ID,
+	}
+
+	err = s.db.DeleteFeedFollow(myCtx, myDeleteParams)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Feed '%s' is no longer followed by user '%s'.\n", myFeed.Name, user.Name)
+	return nil
 }

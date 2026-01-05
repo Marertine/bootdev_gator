@@ -43,14 +43,15 @@ func main() {
 
 	// Populate the list of allowed commands
 	cmds.register("test", debugcmdTest)
-	cmds.register("addfeed", cmdAddFeed)
+	cmds.register("addfeed", middlewareLoggedIn(cmdAddFeed))
 	cmds.register("agg", cmdAgg)
 	cmds.register("feeds", cmdListAllFeeds)
-	cmds.register("follow", cmdFollowFeed)
-	cmds.register("following", cmdFollowing)
+	cmds.register("follow", middlewareLoggedIn(cmdFollowFeed))
+	cmds.register("following", middlewareLoggedIn(cmdFollowing))
 	cmds.register("login", cmdLogin)
 	cmds.register("register", cmdRegister)
 	cmds.register("reset", cmdDeleteAllUsers)
+	cmds.register("unfollow", middlewareLoggedIn(cmdDeleteFollowFeed))
 	cmds.register("users", cmdListAllUsers)
 
 	// Ensure we have ANY command line arguments
