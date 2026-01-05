@@ -36,9 +36,22 @@ func (c *commands) run(s *state, cmd command) error {
 	return f(s, cmd)
 }
 
+func debugcmdTest(s *state, cmd command) error {
+	// quick & dirty test command to test fetchFeed
+	ctx := context.Background()
+
+	feed, err := fetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%+v\n", feed)
+	return nil
+}
+
 func cmdLogin(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
-		return errors.New("'login' requires a username")
+		return errors.New("login requires a username")
 	}
 
 	myCtx := context.Background()
@@ -63,7 +76,7 @@ func cmdLogin(s *state, cmd command) error {
 
 func cmdRegister(s *state, cmd command) error {
 	if len(cmd.Args) == 0 {
-		return errors.New("'register' requires a username")
+		return errors.New("register requires a username")
 	}
 
 	myCtx := context.Background()
@@ -142,4 +155,68 @@ func cmdListAllUsers(s *state, cmd command) error {
 	}
 
 	return nil
+}
+
+func cmdAgg(s *state, cmd command) error {
+	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return fmt.Errorf("couldn't fetch feed: %w", err)
+	}
+	fmt.Printf("Feed: %+v\n", feed)
+	return nil
+}
+
+func cmdAddFeed(s *state, cmd command) error {
+	if len(cmd.Args) < 2 {
+		return errors.New("addfeed requires a name and a URL")
+	}
+
+	myCtx := context.Background()
+
+	myUser, err := s.db.GetUser(myCtx, s.cfg.CurrentUserName)
+	if err != nil {
+		// Don't need to test for sql.ErrNoRows separately here because we tested that in login
+		// All other errors
+		return err
+	}
+
+	myFeedParams := database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      cmd.Args[0],
+		Url:       cmd.Args[1],
+		UserID:    myUser.ID,
+	}
+
+	feed, err := s.db.CreateFeed(myCtx, myFeedParams)
+	if err != nil {
+		/*// Type assertion to *pq.Error
+		if pqErr, ok := err.(*pq.Error); ok {
+			// Inspect the PostgreSQL error code
+			fmt.Println("Postgres error code:", pqErr.Code)
+			fmt.Println("Message:", pqErr.Message)
+			fmt.Println("Detail:", pqErr.Detail)
+			fmt.Println("Constraint:", pqErr.Constraint)
+
+			// Example: unique violation
+			if pqErr.Code == "23505" {
+				return fmt.Errorf("Feed already exists")
+			}
+		}*/
+		// All other errors
+		return err
+	}
+
+	fmt.Printf("Feed '%s' has been created.\n", feed.Name)
+	printFeed(feed)
+
+	return nil
+}
+
+func printFeed(feed database.Feed) {
+	fmt.Printf(" * ID:      %v\n", feed.ID)
+	fmt.Printf(" * Name:    %v\n", feed.Name)
+	fmt.Printf(" * URL:     %v\n", feed.Url)
+	fmt.Printf(" * User ID: %v\n", feed.UserID)
 }

@@ -42,10 +42,18 @@ func main() {
 	}
 
 	// Populate the list of allowed commands
+	cmds.register("test", debugcmdTest)
+	cmds.register("addfeed", cmdAddFeed)
+	cmds.register("agg", cmdAgg)
 	cmds.register("login", cmdLogin)
 	cmds.register("register", cmdRegister)
 	cmds.register("reset", cmdDeleteAllUsers)
 	cmds.register("users", cmdListAllUsers)
+
+	// Ensure we have ANY command line arguments
+	if len(os.Args) < 2 {
+		log.Fatal("no command line arguments provided")
+	}
 
 	// Ensure the appropriate number of command line arguments for each command
 	// When compiled...
@@ -55,6 +63,12 @@ func main() {
 	// 		os.Args[3] = arg2
 	intRequiredOSArgLength := 0
 	switch os.Args[1] {
+	case "test":
+		intRequiredOSArgLength = 2
+	case "addfeed":
+		intRequiredOSArgLength = 4
+	case "agg":
+		intRequiredOSArgLength = 2
 	case "login":
 		intRequiredOSArgLength = 3
 	case "register":
@@ -76,7 +90,7 @@ func main() {
 
 	err = cmds.run(myState, myCmd)
 	if err != nil {
-		log.Printf("DEBUG handler error: %v", err)
+		//log.Printf("DEBUG handler error: %v", err)
 		log.Fatal(err)
 	}
 
