@@ -3,13 +3,16 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Config struct {
 	DbURL           string `json:"db_url"`
 	CurrentUserName string `json:"current_user_name"`
+	httpClient      http.Client
 }
 
 func getConfigFilePath() (string, error) {
@@ -56,6 +59,7 @@ func (c *Config) SetUser(name string) error {
 
 	// Put the provided parameter into the Config struct
 	c.CurrentUserName = name
+	c.httpClient = http.Client{Timeout: 5 * time.Second}
 
 	strConfigFile, err := getConfigFilePath()
 	if err != nil {
@@ -75,3 +79,14 @@ func (c *Config) SetUser(name string) error {
 
 	return nil
 }
+
+/*func NewClient(timeout time.Duration) Client {
+	c := Client{
+		httpClient: http.Client{
+			Timeout: timeout,
+		},
+		cache: pokecache.NewCache(5 * time.Second),
+	}
+
+	return c
+}*/
