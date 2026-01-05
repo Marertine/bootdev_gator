@@ -220,3 +220,21 @@ func printFeed(feed database.Feed) {
 	fmt.Printf(" * URL:     %v\n", feed.Url)
 	fmt.Printf(" * User ID: %v\n", feed.UserID)
 }
+
+func cmdListAllFeeds(s *state, cmd command) error {
+	myCtx := context.Background()
+
+	respFeeds, err := s.db.GetFeeds(myCtx)
+	if err != nil {
+		// All other errors
+		return err
+	}
+
+	for _, feed := range respFeeds {
+		fmt.Printf("* %s\n", feed.Name)
+		fmt.Printf("* %s\n", feed.Url)
+		fmt.Printf("* %s\n", feed.UserID)
+	}
+
+	return nil
+}

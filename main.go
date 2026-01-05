@@ -45,6 +45,7 @@ func main() {
 	cmds.register("test", debugcmdTest)
 	cmds.register("addfeed", cmdAddFeed)
 	cmds.register("agg", cmdAgg)
+	cmds.register("feeds", cmdListAllFeeds)
 	cmds.register("login", cmdLogin)
 	cmds.register("register", cmdRegister)
 	cmds.register("reset", cmdDeleteAllUsers)
