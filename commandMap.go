@@ -1,15 +1,8 @@
 package main
 
 import (
-	"context"
-	"database/sql"
 	"errors"
-	"fmt"
-	"time"
 
-	"github.com/Marertine/bootdev_gator/internal/database"
-	"github.com/google/uuid"
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
@@ -36,7 +29,7 @@ func (c *commands) run(s *state, cmd command) error {
 	return f(s, cmd)
 }
 
-func debugcmdTest(s *state, cmd command) error {
+/*func debugcmdTest(s *state, cmd command) error {
 	// quick & dirty test command to test fetchFeed
 	ctx := context.Background()
 
@@ -173,13 +166,6 @@ func cmdAddFeed(s *state, cmd command, user database.User) error {
 
 	myCtx := context.Background()
 
-	/*myUser, err := s.db.GetUser(myCtx, s.cfg.CurrentUserName)
-	if err != nil {
-		// Don't need to test for sql.ErrNoRows separately here because we tested that in login
-		// All other errors
-		return err
-	}*/
-
 	myFeedParams := database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
@@ -191,19 +177,7 @@ func cmdAddFeed(s *state, cmd command, user database.User) error {
 
 	feed, err := s.db.CreateFeed(myCtx, myFeedParams)
 	if err != nil {
-		/*// Type assertion to *pq.Error
-		if pqErr, ok := err.(*pq.Error); ok {
-			// Inspect the PostgreSQL error code
-			fmt.Println("Postgres error code:", pqErr.Code)
-			fmt.Println("Message:", pqErr.Message)
-			fmt.Println("Detail:", pqErr.Detail)
-			fmt.Println("Constraint:", pqErr.Constraint)
 
-			// Example: unique violation
-			if pqErr.Code == "23505" {
-				return fmt.Errorf("Feed already exists")
-			}
-		}*/
 		// All other errors
 		return err
 	}
@@ -264,11 +238,6 @@ func cmdFollowing(s *state, cmd command, user database.User) error {
 	myCtx := context.Background()
 
 	//userName := s.cfg.CurrentUserName
-
-	/*myUser, err := s.db.GetUser(myCtx, user.Name)
-	if err != nil {
-		return err
-	}*/
 
 	feedFollows, err := s.db.GetFeedFollowsForUser(myCtx, user.ID)
 	if err != nil {
@@ -353,4 +322,4 @@ func cmdDeleteFollowFeed(s *state, cmd command, user database.User) error {
 
 	fmt.Printf("Feed '%s' is no longer followed by user '%s'.\n", myFeed.Name, user.Name)
 	return nil
-}
+}*/
