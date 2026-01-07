@@ -45,6 +45,7 @@ func main() {
 	cmds.register("test", debugcmdTest)
 	cmds.register("addfeed", middlewareLoggedIn(cmdAddFeed))
 	cmds.register("agg", cmdAgg)
+	cmds.register("browse", middlewareLoggedIn(cmdBrowse))
 	cmds.register("feeds", cmdListAllFeeds)
 	cmds.register("follow", middlewareLoggedIn(cmdFollowFeed))
 	cmds.register("following", middlewareLoggedIn(cmdFollowing))

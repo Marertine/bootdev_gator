@@ -2,34 +2,27 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
 	_ "github.com/lib/pq"
 )
 
 func cmdLogin(s *state, cmd command) error {
-	if len(cmd.Args) == 0 {
-		return errors.New("login requires a username")
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %v <name>", cmd.Name)
 	}
+	name := cmd.Args[0]
 
-	myCtx := context.Background()
-	user, err := s.db.GetUser(myCtx, cmd.Args[0])
+	_, err := s.db.GetUser(context.Background(), name)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			// 0 rows returned → user not found
-			return fmt.Errorf("login: user not found")
-		}
-		// All other errors
-		return err
+		return fmt.Errorf("couldn't find user: %w", err)
 	}
 
-	err = s.cfg.SetUser(user.Name)
+	err = s.cfg.SetUser(name)
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
-	fmt.Printf("User has been set as '%s'\n", user.Name)
+	fmt.Println("User switched successfully!")
 	return nil
 }
